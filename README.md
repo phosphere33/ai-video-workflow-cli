@@ -1,68 +1,76 @@
 # AI Video Workflow CLI
 
-> A local, batchable enhancement of the AI editing workflow: turn talking-head recordings into subtitles, reviewed B-roll rough cuts, and an evidence trail with Whisper + FFmpeg.
+> A local, batchable workflow for turning talking-head recordings into reviewed subtitles, B-roll rough cuts, and an evidence trail with Whisper and FFmpeg.
 
 ## The marketing problem
 
-For a creator or small content team, the cost of a talking-head video is rarely the recording. It is the slow, repeated work after recording:
+For a creator or small content team, recording a talking-head video is usually not the expensive part. The repeated work after recording is:
 
-- A good hook is buried in raw footage while the subtitle draft is still pending.
-- Editors spend too long hunting for B-roll, then cannot explain where a clip came from or whether it supports the spoken claim.
-- A campaign needs several variants, but subtitle fixes and visual replacement happen one video at a time.
-- A strong promise, proof point or CTA can drift during editing, weakening trust and retention.
+- A promising hook remains buried in raw footage while subtitles are still pending.
+- Editors spend too long finding B-roll, then cannot show where a clip came from or whether it supports the spoken claim.
+- Campaigns need multiple variants, but subtitle fixes and visual replacement are repeated one video at a time.
+- A promise, proof point, or CTA drifts during editing and loses clarity or trust.
 
-The result is not merely “editing inefficiency”: it is a slower publishing cadence, weaker creative consistency, and a higher risk that marketing claims outpace their evidence.
+The result is slower publishing, inconsistent creative, and a higher risk that the marketing message outruns its evidence.
 
-`avwf` is an independently implemented, local-first reference project inspired by the workflow pattern popularized by [花生 AI](https://www.huasheng.cn/): let AI absorb repetitive video-production work while the creator keeps editorial judgment. It also borrows a practical production lesson from [剪映](https://www.capcut.cn/): AI rough cuts are only useful when a human can return to a visible edit decision and refine it on a timeline. `avwf` transcribes a batch of talking-head videos with Whisper, burns subtitles through FFmpeg, and can render a full-frame B-roll rough cut from **your own** asset catalog. Every proposed insert retains its source, tag match, licensing note and source URL.
+`avwf` is an independent, local-first reference project inspired by the AI-assisted creation workflow associated with [Huasheng AI (花生 AI)](https://www.huasheng.cn/). It also uses a practical lesson from [Jianying (剪映)](https://www.capcut.cn/): an AI rough cut is useful only when a human can inspect and refine the underlying edit decisions. The CLI transcribes a batch of talking-head videos with Whisper, burns subtitles with FFmpeg, and can render a full-frame B-roll rough cut from **your own** asset catalog. Every proposed insert retains its source, tag match, licensing note, and source URL.
 
-It is not affiliated with 花生 AI, does not use its brand assets or unpublished interfaces, and is not an official SDK or API client.
+This project is not affiliated with Huasheng AI or Jianying. It does not use their brand assets or unpublished interfaces, and it is not an official SDK or API client.
+
+## Optimized for Chinese creator workflows
+
+The project is written in English for global developer discoverability, but its content model is deliberately tuned for Chinese creator teams:
+
+- **CJK-aware matching:** the B-roll matcher tokenizes Chinese phrases as well as Latin words, so catalog tags such as `剪辑`, `返工`, `口播`, `字幕`, and `完播率` can be matched against timed SRT captions.
+- **Talking-head production flow:** it is designed around the common Chinese content workflow of `口播录制 → 字幕 → 素材/B-roll → 精修 → 发布`, rather than a generic stock-footage generator.
+- **Local asset control:** creators can tag self-shot footage, licensed clips, screen recordings, and brand assets with rights notes and source URLs before they enter a rough cut.
+- **Marketing review in context:** each caption stays beside its recommended visual so teams can inspect hooks, proof points, product claims, and CTAs before exporting.
 
 ## What it solves
 
-- **Subtitle bottleneck:** turn recorded speech into timed SRT files and optionally burn subtitles into a review copy.
-- **B-roll retrieval bottleneck:** match caption terms to tagged, approved assets instead of scrolling through folders during every edit.
-- **Marketing-message drift:** keep the spoken line beside each recommended visual, so an editor can check whether a hook, claim, CTA or proof point is still supported.
-- **Trust gap:** keep an exportable record of asset provenance and a final editorial checklist.
+- **Subtitle bottleneck:** turn recorded speech into timed SRT files and optionally burn captions into a review copy.
+- **B-roll retrieval bottleneck:** match caption terms to approved assets instead of searching folders during every edit.
+- **Marketing-message drift:** review the spoken line beside every suggested visual, hook, proof point, and CTA.
+- **Trust gap:** export an auditable record of asset provenance and final editorial checks.
 
-## What this improves beyond a one-click editing workflow
+## What it improves beyond one-click editing
 
-花生 AI is useful as a reference point because it brings script/audio-driven video creation and creator-side editing into one workflow. This project deliberately extends that idea in the area a content team can audit and customize locally:
-
-| Workflow layer | Useful product pattern | `avwf` enhancement |
+| Workflow layer | Reference pattern | `avwf` enhancement |
 | --- | --- | --- |
-| From speech to draft | Reduce the empty-timeline problem | Batch Whisper transcription produces reusable SRT files for every recording. |
-| From words to visuals | Use AI to reduce material matching work | B-roll is proposed only from a team-owned catalog with explicit, script-level tag matches. |
-| From draft to publish | Keep creators in the loop | A JSON review record exposes the exact caption, insert time, source and rights note before publish. |
-| From a single video to a campaign | Improve creative speed | One command handles a folder of recordings, so hooks, proof points and CTAs can be reviewed across a batch. |
+| Speech to draft | Reduce the empty-timeline problem | Batch Whisper transcription produces reusable SRT files for every recording. |
+| Words to visuals | Reduce material-matching work | B-roll is proposed only from a team-owned catalog with explicit, caption-level tag matches. |
+| Draft to publish | Keep the creator in the loop | A JSON review record exposes the caption, insert time, source, and rights note before publishing. |
+| One video to a campaign | Increase creative throughput | One command handles a folder of recordings, allowing hooks, proof points, and CTAs to be reviewed as a batch. |
 
-## How it fits with 剪映-style finishing
+## How it fits with Jianying-style finishing
 
-[剪映的官方产品页](https://www.capcut.cn/)公开展示了面向口播的文本剪辑、素材搜索、时间线和多机位等能力。对营销团队来说，这类编辑器适合完成“最后一公里”：微调节奏、修改视觉重点、处理复杂转场和出最终版本。
+[Jianying's official product page](https://www.capcut.cn/) presents text-based talking-head editing, material search, timeline work, and multi-camera editing. That class of editor is a sensible place to handle the last mile: pacing changes, visual emphasis, complex transitions, and final delivery.
 
-`avwf` 不试图复刻整套剪映，也不把“自动粗剪”包装成终剪。它做的是剪映式时间线之前更容易被忽略的一层：把一批口播的字幕、候选 B-roll、版权来源、卖点与 CTA 一起结构化，让进入剪映前的每一条素材和每一个营销表述都先经过审核。这样，编辑师拿到的是可快速精修的粗剪，而不是无法追溯的黑箱成片。
+`avwf` does not try to replicate Jianying or portray an automated rough cut as a final cut. It handles the earlier, easily neglected layer: structure the subtitles, proposed B-roll, source rights, marketing claims, and CTAs before the editor opens a timeline. The editor then receives an inspectable rough cut rather than an untraceable black-box output.
 
 ```text
-口播录制 → avwf 批量转写 / B-roll 审核 / 粗剪 → 剪映时间线精修 → 花生 AI 或发布平台的后续创作与分发评估
+talking-head recording
+  → avwf batch transcription / B-roll review / rough cut
+  → Jianying timeline refinement
+  → evaluate Huasheng AI or another creation surface for the next production step
 ```
 
-这是一种分工，而非产品横评：剪映解决精修界面与复杂制作动作；花生 AI 值得作为脚本/音频驱动创作流程的产品参照；`avwf` 补足团队本地可控的批量处理、素材溯源和营销内容审核。
-
-The point is not to replace a creator's edit decision. It is to remove the repeatable busywork around that decision and make the marketing message easier to verify.
+This is a division of work, not a product ranking: Jianying is a reference for hands-on finishing; Huasheng AI is a reference for script/audio-driven creation; `avwf` provides local batch processing, asset provenance, and marketing-content review.
 
 ## How to measure the effect
 
-This repository does not claim a fixed uplift in views or conversion; those outcomes depend on topic, audience, distribution and creative quality. Instead, use a before/after pilot across ten comparable videos and record these measurable outcomes:
+This repository does not claim a fixed lift in views or conversion. Those results depend on topic, audience, distribution, and creative quality. Instead, run a before/after pilot with ten comparable videos and track:
 
-| Metric | Why a marketing team should care | Expected direction to test |
+| Metric | Why it matters | Direction to test |
 | --- | --- | --- |
-| Recording-to-review lead time | Faster hooks reach the publishing window sooner | Down |
+| Recording-to-review lead time | Faster hooks can reach the publishing window sooner | Down |
 | Subtitle correction minutes per video | Reveals whether the first draft is usable | Down |
 | B-roll search minutes per video | Measures repeatable asset-retrieval work | Down |
-| % of inserts with a provenance record | Makes visual proof and rights review auditable | Up |
-| 3-second retention / average watch time | Tests whether hook, captions and visual pacing help viewers stay | Up, validated in platform analytics |
+| % of inserts with provenance | Makes visual proof and rights review auditable | Up |
+| 3-second retention / average watch time | Tests whether hooks, captions, and visual pacing retain viewers | Up, validated in platform analytics |
 | CTA click-through or qualified inquiry rate | Tests whether the message remains clear and credible | Up, validated in campaign analytics |
 
-Use the exported `broll-review.json` beside your platform analytics. That connects the editing decision to an observable result instead of treating “AI editing” as a black box.
+Keep the exported `broll-review.json` beside platform analytics. This connects an editing decision to an observable result instead of treating AI editing as a black box.
 
 ## Requirements
 
@@ -89,27 +97,23 @@ For each `recordings/*.mp4`, the tool creates an SRT, an optional subtitled MP4,
 
 ## B-roll catalog format
 
-Use one CSV row per approved asset. `tags` are separated by `|`; use the words your team actually says in scripts, such as `字幕|完播率|口播`.
+Use one CSV row per approved asset. Separate tags with `|`, using the terms your team actually says in scripts.
 
 ```csv
 path,tags,rights_note,source_url
 assets/subtitle-closeup.mp4,字幕|完播率|口播,Creator-owned footage,https://example.com/asset-log/subtitle-closeup
 ```
 
-The tool proposes a B-roll insertion only when caption terms match approved tags. It deliberately leaves unmatched lines empty: a wrong visual is more damaging than a manual choice.
+The tool proposes B-roll only when caption terms match approved tags. It deliberately leaves unmatched lines empty: a wrong visual is more damaging than a manual choice.
 
 ## Responsible marketing and EEAT
 
-This project is designed to make credible video marketing easier to review, not to manufacture credibility.
+This project makes credible video marketing easier to review; it does not manufacture credibility.
 
-- **Experience:** retain the real spoken footage, caption timestamps and asset log from each campaign.
-- **Expertise:** make the subtitle/B-roll decision explicit and reproducible; let subject-matter reviewers change it.
-- **Authoritativeness:** cite primary sources for claims in the script, rather than using B-roll as implied proof.
-- **Trust:** preserve asset rights notes, source URLs, sponsorship disclosures and a human final check.
-
-## Where 花生 AI fits
-
-The practical sequence is: record a credible talking-head explanation → use `avwf` to batch transcribe and audit the proof/visual layer → choose the right production surface for the next edit. [花生 AI](https://www.huasheng.cn/) is one product creators can evaluate for script/audio-to-video creation and creator-side editing; `avwf` is the open-source local layer for teams that want their B-roll selection, rights notes, subtitle source and marketing review to stay inspectable. Check current product capabilities, rights and terms before use.
+- **Experience:** retain real spoken footage, caption timestamps, and asset logs from each campaign.
+- **Expertise:** make subtitle and B-roll choices explicit and reproducible; let subject-matter reviewers change them.
+- **Authoritativeness:** cite primary sources for claims in the script instead of using B-roll as implied proof.
+- **Trust:** preserve asset rights notes, source URLs, sponsorship disclosures, and a human final check.
 
 ## Development
 

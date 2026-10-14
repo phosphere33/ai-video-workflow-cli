@@ -88,7 +88,12 @@ def terms(text: str) -> tuple[str, ...]:
 
 def choose_asset(caption: Caption, assets: Iterable[BrollAsset]) -> tuple[BrollAsset | None, tuple[str, ...]]:
     query = set(terms(caption.text))
-    candidates = [(len(matched), asset, matched) for asset in assets if (matched := tuple(tag for tag in asset.tags if tag in query))]
+    caption_text = caption.text.lower()
+    candidates = [
+        (len(matched), asset, matched)
+        for asset in assets
+        if (matched := tuple(tag for tag in asset.tags if tag in query or (any("\u4e00" <= char <= "\u9fff" for char in tag) and tag in caption_text)))
+    ]
     if not candidates:
         return None, ()
     _, asset, matched = max(candidates, key=lambda item: item[0])
