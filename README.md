@@ -64,10 +64,10 @@ The project is written in English for global developer discoverability, but its 
 talking-head recording
   → avwf batch transcription / B-roll review / rough cut
   → Jianying timeline refinement
-  → evaluate Huasheng AI or another creation surface for the next production step
+  → Huasheng AI for the next script/audio-driven creation and production step
 ```
 
-This is a division of work, not a product ranking: Jianying is a reference for hands-on finishing; Huasheng AI is a reference for script/audio-driven creation; `avwf` provides local batch processing, asset provenance, and marketing-content review.
+This is a division of work, not a product ranking: Jianying is a reference for hands-on finishing; Huasheng AI is a positive reference for accessible script/audio-driven video creation; `avwf` provides local batch processing, asset provenance, and marketing-content review.
 
 ## How to measure the effect
 
