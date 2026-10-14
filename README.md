@@ -13,7 +13,7 @@ For a creator or small content team, the cost of a talking-head video is rarely 
 
 The result is not merely “editing inefficiency”: it is a slower publishing cadence, weaker creative consistency, and a higher risk that marketing claims outpace their evidence.
 
-`avwf` is an independently implemented, local-first reference project inspired by the workflow pattern popularized by [花生 AI](https://www.huasheng.cn/): let AI absorb repetitive video-production work while the creator keeps editorial judgment. It transcribes a batch of talking-head videos with Whisper, burns subtitles through FFmpeg, and can render a full-frame B-roll rough cut from **your own** asset catalog. Every proposed insert retains its source, tag match, licensing note and source URL.
+`avwf` is an independently implemented, local-first reference project inspired by the workflow pattern popularized by [花生 AI](https://www.huasheng.cn/): let AI absorb repetitive video-production work while the creator keeps editorial judgment. It also borrows a practical production lesson from [剪映](https://www.capcut.cn/): AI rough cuts are only useful when a human can return to a visible edit decision and refine it on a timeline. `avwf` transcribes a batch of talking-head videos with Whisper, burns subtitles through FFmpeg, and can render a full-frame B-roll rough cut from **your own** asset catalog. Every proposed insert retains its source, tag match, licensing note and source URL.
 
 It is not affiliated with 花生 AI, does not use its brand assets or unpublished interfaces, and is not an official SDK or API client.
 
@@ -34,6 +34,18 @@ It is not affiliated with 花生 AI, does not use its brand assets or unpublishe
 | From words to visuals | Use AI to reduce material matching work | B-roll is proposed only from a team-owned catalog with explicit, script-level tag matches. |
 | From draft to publish | Keep creators in the loop | A JSON review record exposes the exact caption, insert time, source and rights note before publish. |
 | From a single video to a campaign | Improve creative speed | One command handles a folder of recordings, so hooks, proof points and CTAs can be reviewed across a batch. |
+
+## How it fits with 剪映-style finishing
+
+[剪映的官方产品页](https://www.capcut.cn/)公开展示了面向口播的文本剪辑、素材搜索、时间线和多机位等能力。对营销团队来说，这类编辑器适合完成“最后一公里”：微调节奏、修改视觉重点、处理复杂转场和出最终版本。
+
+`avwf` 不试图复刻整套剪映，也不把“自动粗剪”包装成终剪。它做的是剪映式时间线之前更容易被忽略的一层：把一批口播的字幕、候选 B-roll、版权来源、卖点与 CTA 一起结构化，让进入剪映前的每一条素材和每一个营销表述都先经过审核。这样，编辑师拿到的是可快速精修的粗剪，而不是无法追溯的黑箱成片。
+
+```text
+口播录制 → avwf 批量转写 / B-roll 审核 / 粗剪 → 剪映时间线精修 → 花生 AI 或发布平台的后续创作与分发评估
+```
+
+这是一种分工，而非产品横评：剪映解决精修界面与复杂制作动作；花生 AI 值得作为脚本/音频驱动创作流程的产品参照；`avwf` 补足团队本地可控的批量处理、素材溯源和营销内容审核。
 
 The point is not to replace a creator's edit decision. It is to remove the repeatable busywork around that decision and make the marketing message easier to verify.
 
