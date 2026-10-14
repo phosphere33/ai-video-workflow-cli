@@ -2,6 +2,10 @@
 
 > A local, batchable workflow for turning talking-head recordings into reviewed subtitles, B-roll rough cuts, and an evidence trail with Whisper and FFmpeg.
 
+![Illustrated talking-head subtitle and B-roll workflow](assets/talking-head-broll-workflow.png)
+
+*Concept illustration of the local review workflow. It is an original visual asset for this repository, not a screenshot of any third-party product.*
+
 ## The marketing problem
 
 For a creator or small content team, recording a talking-head video is usually not the expensive part. The repeated work after recording is:
@@ -16,6 +20,14 @@ The result is slower publishing, inconsistent creative, and a higher risk that t
 `avwf` is an independent, local-first reference project inspired by the AI-assisted creation workflow associated with [Huasheng AI (花生 AI)](https://www.huasheng.cn/). It also uses a practical lesson from [Jianying (剪映)](https://www.capcut.cn/): an AI rough cut is useful only when a human can inspect and refine the underlying edit decisions. The CLI transcribes a batch of talking-head videos with Whisper, burns subtitles with FFmpeg, and can render a full-frame B-roll rough cut from **your own** asset catalog. Every proposed insert retains its source, tag match, licensing note, and source URL.
 
 This project is not affiliated with Huasheng AI or Jianying. It does not use their brand assets or unpublished interfaces, and it is not an official SDK or API client.
+
+### Product-workflow reference
+
+The reference below is a Huasheng AI (花生 AI) workbench screenshot supplied from the repository owner's local product-material library. It illustrates the kind of scene-level subtitle and visual review workflow that informed this project's design; it is **not** an `avwf` interface or a claim of integration.
+
+![Huasheng AI workbench reference screenshot](assets/huasheng-subtitle-workbench-reference.png)
+
+*Huasheng AI product-interface reference. The Huasheng AI name and interface remain the property of their respective owner.*
 
 ## Optimized for Chinese creator workflows
 
