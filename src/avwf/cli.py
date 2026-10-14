@@ -1,50 +1,58 @@
-"""Command-line interface for AVWF."""
+"""Command-line interface for batch subtitle and B-roll preparation."""
 
 from __future__ import annotations
 
 import argparse
 from pathlib import Path
+import subprocess
 import sys
 
-from .planner import build_plan, write_plan
+from .editor import build_inserts, load_catalog, parse_srt, render_broll, render_subtitles, run_whisper, write_manifest
 
 
-def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(
-        prog="avwf",
-        description="Build reviewable batch plans for script-to-video production.",
-    )
-    subparsers = parser.add_subparsers(dest="command", required=True)
-    plan = subparsers.add_parser("plan", help="Create a JSON scene plan from a UTF-8 script.")
-    plan.add_argument("script", type=Path, help="Path to a UTF-8 text script.")
-    plan.add_argument("--title", required=True, help="Project title for the plan.")
-    plan.add_argument("--output", type=Path, default=Path("dist/video-plan.json"))
-    plan.add_argument("--aspect-ratio", default="9:16", choices=("16:9", "9:16", "1:1"))
-    plan.add_argument("--max-chars", type=int, default=72, help="Maximum narration characters per scene.")
-    plan.add_argument("--chars-per-second", type=float, default=4.2)
-    plan.add_argument("--asset", action="append", default=[], help="Approved local asset path (repeatable).")
-    return parser
+def parser() -> argparse.ArgumentParser:
+    root = argparse.ArgumentParser(prog="avwf", description="Local-first batch workflow for talking-head subtitles and B-roll review.")
+    sub = root.add_subparsers(dest="command", required=True)
+    batch = sub.add_parser("batch", help="Transcribe videos, burn subtitles, and create B-roll review manifests.")
+    batch.add_argument("videos", type=Path, help="A video file or directory containing .mp4 files.")
+    batch.add_argument("--catalog", type=Path, required=True, help="CSV: path,tags,rights_note,source_url")
+    batch.add_argument("--output", type=Path, default=Path("dist"))
+    batch.add_argument("--model", default="base", help="Whisper model when --srt-dir is not supplied.")
+    batch.add_argument("--srt-dir", type=Path, help="Reuse existing SRTs instead of invoking Whisper.")
+    batch.add_argument("--render-subtitles", action="store_true", help="Write MP4 files with burned-in subtitles.")
+    batch.add_argument("--render-broll", action="store_true", help="Write a full-frame B-roll rough cut from matched approved assets.")
+    return root
+
+
+def videos(path: Path) -> list[Path]:
+    if path.is_file():
+        return [path]
+    found = sorted(path.glob("*.mp4"))
+    if not found:
+        raise ValueError(f"No .mp4 files found in {path}")
+    return found
 
 
 def main(argv: list[str] | None = None) -> int:
-    args = build_parser().parse_args(argv)
-    if args.command == "plan":
-        try:
-            plan = build_plan(
-                args.script,
-                title=args.title,
-                aspect_ratio=args.aspect_ratio,
-                max_chars=args.max_chars,
-                chars_per_second=args.chars_per_second,
-                local_assets=args.asset,
-            )
-            write_plan(plan, args.output)
-        except (OSError, ValueError) as error:
-            print(f"error: {error}", file=sys.stderr)
-            return 2
-        print(f"Wrote {len(plan['scenes'])} scenes to {args.output}")
-        return 0
-    return 2
+    args = parser().parse_args(argv)
+    try:
+        catalog = load_catalog(args.catalog)
+        for video in videos(args.videos):
+            project_dir = args.output / video.stem
+            srt = args.srt_dir / f"{video.stem}.srt" if args.srt_dir else run_whisper(video, project_dir, args.model)
+            inserts = build_inserts(parse_srt(srt), catalog)
+            write_manifest(video, srt, inserts, project_dir / "broll-review.json")
+            review_copy = video
+            if args.render_subtitles:
+                review_copy = project_dir / f"{video.stem}.subtitled.mp4"
+                render_subtitles(video, srt, review_copy)
+            if args.render_broll:
+                render_broll(review_copy, inserts, project_dir / f"{video.stem}.rough-cut.mp4")
+            print(f"Prepared {video.name}: {project_dir}")
+    except (OSError, RuntimeError, ValueError, subprocess.CalledProcessError) as error:
+        print(f"error: {error}", file=sys.stderr)
+        return 2
+    return 0
 
 
 if __name__ == "__main__":

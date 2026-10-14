@@ -20,6 +20,9 @@ classifiers = [
 [project.scripts]
 avwf = "avwf.cli:main"
 
+[project.optional-dependencies]
+transcription = ["openai-whisper>=20231117"]
+
 [tool.setuptools]
 package-dir = {"" = "src"}
 
